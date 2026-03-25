@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/lullabot-adrs-trivia/',
+  base: process.env.BASE_PATH || '/',
   server: {
     host: true,
   },

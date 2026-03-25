@@ -1,6 +1,6 @@
 name: lullabot-adrs-trivia
 type: generic
-docroot: ""
+docroot: dist
 nodejs_version: "22"
 corepack_enable: false
 use_dns_when_possible: true
@@ -14,4 +14,4 @@ web_extra_exposed_ports:
 
 hooks:
   post-start:
-    - exec: npm install
+    - exec: npm install && npm run build
