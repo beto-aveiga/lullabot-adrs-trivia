@@ -236,9 +236,18 @@ function showStartScreen() {
 }
 
 function startGame(mode, categories, adrSources = []) {
-  createGame(app, { mode, categories, adrSources }, (gameState, newAchievements, continueCallback) => {
-    showResultsScreen(gameState, newAchievements, continueCallback);
-  });
+  createGame(
+    app,
+    {
+      mode,
+      categories,
+      adrSources,
+      onExit: showStartScreen,
+    },
+    (gameState, newAchievements, continueCallback) => {
+      showResultsScreen(gameState, newAchievements, continueCallback);
+    }
+  );
 }
 
 function formatAdrLabel(source) {

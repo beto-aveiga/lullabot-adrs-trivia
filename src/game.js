@@ -13,7 +13,7 @@ const BASE_POINTS = 1000;
 const MAX_LIVES = 3;
 
 export function createGame(app, options, onGameEnd) {
-  const { mode, categories, adrSources } = options;
+  const { mode, categories, adrSources, onExit } = options;
   let gameQuestions = getQuestionsForMode(mode, categories, adrSources);
   let currentIndex = 0;
   let score = 0;
@@ -74,6 +74,22 @@ export function createGame(app, options, onGameEnd) {
     }
 
     const q = gameQuestions[currentIndex];
+
+    const controls = document.createElement('div');
+    controls.className = 'flex justify-end mb-3';
+
+    const exitBtn = document.createElement('button');
+    exitBtn.className = 'px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition-colors';
+    exitBtn.textContent = '← Back to Start';
+    exitBtn.addEventListener('click', () => {
+      if (timer) timer.stop();
+      if (lifelines) lifelines.disableAll();
+      if (typeof onExit === 'function') {
+        onExit();
+      }
+    });
+    controls.appendChild(exitBtn);
+    app.appendChild(controls);
 
     // Header
     const header = document.createElement('div');
