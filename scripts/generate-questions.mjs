@@ -213,21 +213,25 @@ function makeMatching(q, index) {
   };
 }
 
+const targetCount = Number.parseInt(process.argv[2] || '100', 10);
 const generators = [makeMc, makeFill, makeOrder, makeMatching];
+const generatedIdSuffix = /-(insight|fill|workflow|match)-\d+(-\d+)?$/;
+const baseQuestions = existing.filter((q) => !generatedIdSuffix.test(q.id));
+const sourceQuestions = baseQuestions.length > 0 ? baseQuestions : existing;
 const newQuestions = [];
 
-for (let i = 0; i < existing.length && newQuestions.length < 100; i++) {
-  const q = existing[i];
+for (let i = 0; sourceQuestions.length > 0 && newQuestions.length < targetCount; i++) {
+  const q = sourceQuestions[i % sourceQuestions.length];
   const g1 = generators[i % generators.length];
   const g2 = generators[(i + 2) % generators.length];
   newQuestions.push(g1(q, 1));
-  if (newQuestions.length < 100) {
+  if (newQuestions.length < targetCount) {
     newQuestions.push(g2(q, 2));
   }
 }
 
-for (const q of newQuestions.slice(0, 100)) {
+for (const q of newQuestions.slice(0, targetCount)) {
   fs.writeFileSync(path.join(dir, `${q.id}.js`), toModule(q), 'utf8');
 }
 
-console.log(`Generated ${Math.min(newQuestions.length, 100)} questions.`);
+console.log(`Generated ${Math.min(newQuestions.length, targetCount)} questions.`);
