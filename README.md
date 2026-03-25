@@ -4,8 +4,8 @@ A fun, client-side trivia game that tests your knowledge of [Lullabot's Architec
 
 ## Features
 
-- **50 curated questions** across Drupal, front-end, DevOps, Composer, Git, and general topics
-- **4 question types**: multiple-choice, fill-in-the-blank, drag-to-order, and matching
+- **100 curated questions** across Drupal, front-end, DevOps, Composer, Git, and general topics
+- **Question types in current set**: multiple-choice, fill-in-the-blank, and drag-to-order
 - **Game modes**: Classic (3 lives), ADR Focus (pick specific ADRs), and Daily Challenge (10 daily questions with shareable results)
 - **Lifelines**: 50/50, Read the ADR, and Skip
 - **Streak bonuses**: consecutive correct answers multiply your score
