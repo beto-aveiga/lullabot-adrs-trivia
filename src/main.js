@@ -149,6 +149,47 @@ function showStartScreen() {
   adrInfo.className = 'text-xs text-slate-400 mb-2';
   adrSection.appendChild(adrInfo);
 
+  // Build category → ADR sources mapping
+  const adrCategoryMap = new Map();
+  questions.forEach((q) => {
+    if (!adrCategoryMap.has(q.source)) adrCategoryMap.set(q.source, q.category);
+  });
+  const adrCategories = [...new Set([...adrCategoryMap.values()])].sort();
+
+  const adrCatGrid = document.createElement('div');
+  adrCatGrid.className = 'flex flex-wrap gap-2 mb-3';
+
+  function getAdrSourcesForCategory(cat) {
+    return allAdrSources.filter((src) => adrCategoryMap.get(src) === cat);
+  }
+
+  function isCategoryFullySelected(cat) {
+    return getAdrSourcesForCategory(cat).every((src) => selectedAdrSources.has(src));
+  }
+
+  function renderCategoryButtons() {
+    adrCatGrid.innerHTML = '';
+    adrCategories.forEach((cat) => {
+      const srcs = getAdrSourcesForCategory(cat);
+      const full = isCategoryFullySelected(cat);
+      const btn = document.createElement('button');
+      btn.className = `px-3 py-1.5 rounded-lg text-sm font-medium border-2 transition-all ${full ? 'border-cyan-500 bg-cyan-500/10 text-cyan-300' : 'border-slate-600 bg-slate-800 text-slate-400'}`;
+      btn.textContent = `${cat} (${srcs.length})`;
+      btn.addEventListener('click', () => {
+        if (full) {
+          srcs.forEach((src) => selectedAdrSources.delete(src));
+        } else {
+          srcs.forEach((src) => selectedAdrSources.add(src));
+        }
+        renderCategoryButtons();
+        renderAdrButtons();
+      });
+      adrCatGrid.appendChild(btn);
+    });
+  }
+
+  adrSection.appendChild(adrCatGrid);
+
   const adrToolbar = document.createElement('div');
   adrToolbar.className = 'flex gap-2 mb-2';
 
@@ -157,6 +198,7 @@ function showStartScreen() {
   selectAllBtn.textContent = 'Select all';
   selectAllBtn.addEventListener('click', () => {
     allAdrSources.forEach((src) => selectedAdrSources.add(src));
+    renderCategoryButtons();
     renderAdrButtons();
   });
 
@@ -165,6 +207,7 @@ function showStartScreen() {
   clearBtn.textContent = 'Clear';
   clearBtn.addEventListener('click', () => {
     selectedAdrSources.clear();
+    renderCategoryButtons();
     renderAdrButtons();
   });
 
@@ -191,12 +234,14 @@ function showStartScreen() {
         } else {
           selectedAdrSources.add(src);
         }
+        renderCategoryButtons();
         renderAdrButtons();
       });
       adrGrid.appendChild(btn);
     });
   }
 
+  renderCategoryButtons();
   renderAdrButtons();
   app.appendChild(adrSection);
 
