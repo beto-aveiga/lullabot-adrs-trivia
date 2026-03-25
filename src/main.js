@@ -42,21 +42,22 @@ function showStartScreen() {
       </div>
     `;
     app.appendChild(stats);
-
-    const progressContainer = document.createElement('div');
-    progressContainer.className = 'mb-6';
-    const pct = questions.length > 0 ? Math.round((mastered / questions.length) * 100) : 0;
-    progressContainer.innerHTML = `
-      <div class="flex justify-between text-sm text-slate-400 mb-1">
-        <span>Mastery Progress</span>
-        <span>${pct}%</span>
-      </div>
-      <div class="w-full h-3 bg-slate-700 rounded-full overflow-hidden">
-        <div class="h-full bg-gradient-to-r from-teal-500 to-cyan-400 rounded-full transition-all" style="width: ${pct}%"></div>
-      </div>
-    `;
-    app.appendChild(progressContainer);
   }
+
+  // Mastery Progress
+  const progressContainer = document.createElement('div');
+  progressContainer.className = 'mb-6';
+  const pct = questions.length > 0 ? Math.round((mastered / questions.length) * 100) : 0;
+  progressContainer.innerHTML = `
+    <div class="flex justify-between text-sm text-slate-400 mb-1">
+      <span>Mastery Progress</span>
+      <span>${pct}%</span>
+    </div>
+    <div class="w-full h-3 bg-slate-700 rounded-full overflow-hidden">
+      <div class="h-full bg-gradient-to-r from-teal-500 to-cyan-400 rounded-full transition-all" style="width: ${pct}%"></div>
+    </div>
+  `;
+  app.appendChild(progressContainer);
 
   // Mode selection
   const modeSection = document.createElement('div');
@@ -246,13 +247,11 @@ function showStartScreen() {
   app.appendChild(adrSection);
 
   // Achievements
-  if (data.achievements.length > 0) {
-    const achSection = document.createElement('div');
-    achSection.className = 'mb-6';
-    achSection.innerHTML = `<h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Achievements</h3>`;
-    renderAchievements(achSection);
-    app.appendChild(achSection);
-  }
+  const achSection = document.createElement('div');
+  achSection.className = 'mb-6';
+  achSection.innerHTML = `<h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Achievements</h3>`;
+  renderAchievements(achSection);
+  app.appendChild(achSection);
 
   // Start button
   const startBtn = document.createElement('button');
