@@ -9,7 +9,7 @@ A fun, client-side trivia game that tests your knowledge of [Lullabot's Architec
 - **Game modes**: Classic (3 lives) and Daily Challenge (10 daily questions with shareable results)
 - **Lifelines**: 50/50, Read the ADR, and Skip
 - **Streak bonuses**: consecutive correct answers multiply your score
-- **Countdown timer**: 20 seconds per question with speed-based scoring
+- **Countdown timer**: 45 seconds per question with speed-based scoring
 - **Achievements**: unlock 10 badges as you play
 - **Category filters**: focus on specific topics in Classic mode
 - **End-of-game review**: see explanations and ADR links for every question
@@ -26,18 +26,25 @@ A fun, client-side trivia game that tests your knowledge of [Lullabot's Architec
 
 ```sh
 ddev start
+```
+
+The game is available at `https://lullabot-adrs-trivia.ddev.site`.
+
+For active development with hot-reloading, also run:
+
+```sh
 ddev npm run dev
 ```
 
-The game is available at `https://lullabot-adrs-trivia.ddev.site:5173`.
+This starts the Vite dev server at `https://lullabot-adrs-trivia.ddev.site:5173`.
 
-### Build for production
+### Rebuild after changes
 
 ```sh
 ddev npm run build
 ```
 
-The static output in `dist/` can be deployed to any web server or CDN.
+Rebuilds the static output in `dist/`. This happens automatically on `ddev start`.
 
 ### Validate questions
 

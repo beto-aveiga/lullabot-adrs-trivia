@@ -1,6 +1,6 @@
 import { playCountdownBeep } from './sounds.js';
 
-const TOTAL_TIME = 20;
+const TOTAL_TIME = 45;
 
 export function createTimer(container, onTimeUp) {
   let timeLeft = TOTAL_TIME;
