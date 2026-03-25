@@ -326,16 +326,27 @@ function showReview(answers) {
     cardsContainer.innerHTML = '';
     const filtered = filter === 'all' ? answers : filter === 'wrong' ? answers.filter((a) => !a.correct && !a.skipped) : answers.filter((a) => a.skipped);
 
-    filtered.forEach((a, i) => {
-      const color = a.skipped ? 'yellow' : a.correct ? 'green' : 'red';
+    const cardStyles = {
+      correct: 'bg-green-500/10 border-green-500/30',
+      wrong: 'bg-red-500/10 border-red-500/30',
+      skipped: 'bg-yellow-500/10 border-yellow-500/30',
+    };
+    const statusStyles = {
+      correct: 'text-green-400',
+      wrong: 'text-red-400',
+      skipped: 'text-yellow-400',
+    };
+
+    filtered.forEach((a) => {
+      const kind = a.skipped ? 'skipped' : a.correct ? 'correct' : 'wrong';
       const card = document.createElement('div');
-      card.className = `p-4 rounded-xl bg-${color}-500/10 border-2 border-${color}-500/30`;
+      card.className = `p-4 rounded-xl border-2 ${cardStyles[kind]}`;
       card.innerHTML = `
         <div class="flex items-start justify-between mb-2">
           <h3 class="font-semibold text-slate-200 leading-snug flex-1">${a.question.question}</h3>
           <span class="ml-2 text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">${a.question.category}</span>
         </div>
-        <div class="text-sm mb-2 ${a.skipped ? 'text-yellow-400' : a.correct ? 'text-green-400' : 'text-red-400'}">
+        <div class="text-sm mb-2 ${statusStyles[kind]}">
           ${a.skipped ? '⏭️ Skipped' : a.correct ? '✓ Correct' : '✗ Wrong'}
         </div>
         <p class="text-sm text-slate-300 leading-relaxed mb-2">${a.question.explanation}</p>
