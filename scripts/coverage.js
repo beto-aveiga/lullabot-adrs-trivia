@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url';
 const QUESTIONS_DIR = new URL('../src/questions/', import.meta.url).pathname;
 const ADR_INDEX_URL = 'https://architecture.lullabot.com/adrs/';
 const LOW_COVERAGE_THRESHOLD = Number.parseInt(process.env.LOW_COVERAGE_THRESHOLD || '2', 10);
+const GENERATED_NAME_RE = /-(insight|fill|workflow|match)-\d+(-\d+)?\.js$|-coverage-.*\.js$/;
 
 function normalizeAdrUrl(url) {
   if (!url) return '';
@@ -43,7 +44,9 @@ async function getRemoteAdrs() {
 }
 
 async function loadQuestionFiles() {
-  const files = (await readdir(QUESTIONS_DIR)).filter((f) => f.endsWith('.js') && f !== 'index.js');
+  const files = (await readdir(QUESTIONS_DIR)).filter(
+    (f) => f.endsWith('.js') && f !== 'index.js' && !GENERATED_NAME_RE.test(f)
+  );
   const questions = [];
   for (const file of files) {
     const fullPath = join(QUESTIONS_DIR, file);

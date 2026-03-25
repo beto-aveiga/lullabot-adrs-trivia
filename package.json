@@ -9,8 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "validate": "node scripts/validate.js",
-    "coverage": "node scripts/coverage.js",
-    "generate:targeted": "node scripts/generate-targeted-questions.mjs"
+    "coverage": "node scripts/coverage.js"
   },
   "license": "CC-BY-4.0",
   "devDependencies": {

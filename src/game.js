@@ -13,13 +13,14 @@ const BASE_POINTS = 1000;
 const MAX_LIVES = 3;
 
 export function createGame(app, options, onGameEnd) {
-  const { mode, categories } = options;
-  let gameQuestions = getQuestionsForMode(mode, categories);
+  const { mode, categories, adrSources } = options;
+  let gameQuestions = getQuestionsForMode(mode, categories, adrSources);
   let currentIndex = 0;
   let score = 0;
   let streak = 0;
   let highStreak = 0;
-  let lives = mode === 'classic' ? MAX_LIVES : Infinity;
+  const usesLivesMode = mode === 'classic' || mode === 'adr';
+  let lives = usesLivesMode ? MAX_LIVES : Infinity;
   let correct = 0;
   let skipped = [];
   let answers = [];
@@ -30,15 +31,16 @@ export function createGame(app, options, onGameEnd) {
   let readAdrUseCount = 0;
   let continueMode = false;
 
-  function getQuestionsForMode(mode, categories) {
-    let pool = [...questions];
-    if (categories && categories.length > 0) {
-      pool = pool.filter((q) => categories.includes(q.category));
-    }
+  function getQuestionsForMode(mode, categories, adrSources) {
+    let pool = questions.filter((q) => {
+      const categoryOk = !categories || categories.length === 0 || categories.includes(q.category);
+      const adrOk = !adrSources || adrSources.length === 0 || adrSources.includes(q.source);
+      return categoryOk && adrOk;
+    });
     shuffleArray(pool);
     if (mode === 'daily') {
       const seed = getDailySeed();
-      pool = seededShuffle(questions.filter((q) => !categories || categories.length === 0 || categories.includes(q.category)), seed);
+      pool = seededShuffle(pool, seed);
       return pool.slice(0, 10);
     }
     return pool;
@@ -88,7 +90,7 @@ export function createGame(app, options, onGameEnd) {
 
     const livesEl = document.createElement('div');
     livesEl.className = 'flex gap-1';
-    if (mode === 'classic' && !continueMode) {
+    if (usesLivesMode && !continueMode) {
       for (let i = 0; i < MAX_LIVES; i++) {
         const heart = document.createElement('span');
         heart.className = `text-xl ${i < lives ? 'text-red-500' : 'text-slate-700'} ${lives === 1 && i < lives ? 'animate-pulse-heart' : ''}`;
@@ -209,7 +211,7 @@ export function createGame(app, options, onGameEnd) {
       if (streak > 1) playStreakSound(streak);
     } else {
       streak = 0;
-      if (mode === 'classic' && !continueMode) {
+      if (usesLivesMode && !continueMode) {
         lives--;
         playLifeLost();
       } else {
@@ -316,7 +318,7 @@ export function createGame(app, options, onGameEnd) {
       score,
       skipped,
       answers,
-      livesRemaining: mode === 'classic' ? lives : null,
+      livesRemaining: usesLivesMode ? lives : null,
       elapsedSeconds: elapsed,
     };
 

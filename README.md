@@ -4,9 +4,9 @@ A fun, client-side trivia game that tests your knowledge of [Lullabot's Architec
 
 ## Features
 
-- **300 questions** across Drupal, front-end, DevOps, Composer, Git, and general topics
+- **50 curated questions** across Drupal, front-end, DevOps, Composer, Git, and general topics
 - **4 question types**: multiple-choice, fill-in-the-blank, drag-to-order, and matching
-- **Game modes**: Classic (3 lives) and Daily Challenge (10 daily questions with shareable results)
+- **Game modes**: Classic (3 lives), ADR Focus (pick specific ADRs), and Daily Challenge (10 daily questions with shareable results)
 - **Lifelines**: 50/50, Read the ADR, and Skip
 - **Streak bonuses**: consecutive correct answers multiply your score
 - **Countdown timer**: 45 seconds per question with speed-based scoring
@@ -62,13 +62,7 @@ ddev npm run coverage
 
 Prints how many questions exist per remote ADR and flags low/no coverage so you can prioritize adding questions where needed.
 
-### Generate targeted questions
-
-```sh
-ddev npm run generate:targeted -- 100
-```
-
-Generates a balanced batch that prioritizes ADRs with the fewest questions first.
+Question quality note: short ADRs may only have one or a few questions. We prioritize ADR-specific, meaningful prompts over quantity.
 
 ## Contributing a Question
 

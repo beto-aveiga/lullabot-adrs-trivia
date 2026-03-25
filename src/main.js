@@ -64,12 +64,15 @@ function showStartScreen() {
   modeSection.innerHTML = `<h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Game Mode</h3>`;
 
   let selectedMode = 'classic';
+  const allAdrSources = [...new Set(questions.map((q) => q.source))].sort();
+  const selectedAdrSources = new Set(allAdrSources);
 
   const modeGrid = document.createElement('div');
-  modeGrid.className = 'grid grid-cols-2 gap-3';
+  modeGrid.className = 'grid grid-cols-1 sm:grid-cols-3 gap-3';
 
   const modes = [
     { id: 'classic', name: 'Classic', desc: '3 lives, all questions', icon: '♥' },
+    { id: 'adr', name: 'ADR Focus', desc: 'Choose specific ADRs', icon: '🎯' },
     { id: 'daily', name: 'Daily Challenge', desc: '10 daily questions', icon: '📅' },
   ];
 
@@ -93,6 +96,8 @@ function showStartScreen() {
       btn.classList.remove('border-slate-600', 'bg-slate-800');
       btn.classList.add('border-teal-500', 'bg-teal-500/10');
       categorySection.style.display = m.id === 'classic' ? 'block' : 'none';
+      adrSection.style.display = m.id === 'adr' ? 'block' : 'none';
+      refreshStartButtonLabel();
     });
     modeGrid.appendChild(btn);
   });
@@ -134,6 +139,67 @@ function showStartScreen() {
   categorySection.appendChild(catGrid);
   app.appendChild(categorySection);
 
+  // ADR selector
+  const adrSection = document.createElement('div');
+  adrSection.className = 'mb-6';
+  adrSection.style.display = 'none';
+  adrSection.innerHTML = `<h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">ADRs</h3>`;
+
+  const adrInfo = document.createElement('div');
+  adrInfo.className = 'text-xs text-slate-400 mb-2';
+  adrSection.appendChild(adrInfo);
+
+  const adrToolbar = document.createElement('div');
+  adrToolbar.className = 'flex gap-2 mb-2';
+
+  const selectAllBtn = document.createElement('button');
+  selectAllBtn.className = 'px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium transition-colors';
+  selectAllBtn.textContent = 'Select all';
+  selectAllBtn.addEventListener('click', () => {
+    allAdrSources.forEach((src) => selectedAdrSources.add(src));
+    renderAdrButtons();
+  });
+
+  const clearBtn = document.createElement('button');
+  clearBtn.className = 'px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-colors';
+  clearBtn.textContent = 'Clear';
+  clearBtn.addEventListener('click', () => {
+    selectedAdrSources.clear();
+    renderAdrButtons();
+  });
+
+  adrToolbar.appendChild(selectAllBtn);
+  adrToolbar.appendChild(clearBtn);
+  adrSection.appendChild(adrToolbar);
+
+  const adrGrid = document.createElement('div');
+  adrGrid.className = 'max-h-64 overflow-y-auto pr-1 flex flex-wrap gap-2';
+  adrSection.appendChild(adrGrid);
+
+  function renderAdrButtons() {
+    adrGrid.innerHTML = '';
+    adrInfo.textContent = `Selected ${selectedAdrSources.size} of ${allAdrSources.length} ADRs`;
+    allAdrSources.forEach((src) => {
+      const btn = document.createElement('button');
+      const selected = selectedAdrSources.has(src);
+      btn.className = `px-3 py-1.5 rounded-full text-xs font-medium border-2 transition-all ${selected ? 'border-teal-500 bg-teal-500/10 text-teal-300' : 'border-slate-600 bg-slate-800 text-slate-400'}`;
+      btn.textContent = formatAdrLabel(src);
+      btn.title = src;
+      btn.addEventListener('click', () => {
+        if (selectedAdrSources.has(src)) {
+          selectedAdrSources.delete(src);
+        } else {
+          selectedAdrSources.add(src);
+        }
+        renderAdrButtons();
+      });
+      adrGrid.appendChild(btn);
+    });
+  }
+
+  renderAdrButtons();
+  app.appendChild(adrSection);
+
   // Achievements
   if (data.achievements.length > 0) {
     const achSection = document.createElement('div');
@@ -147,10 +213,18 @@ function showStartScreen() {
   const startBtn = document.createElement('button');
   startBtn.className =
     'w-full py-4 rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white font-bold text-lg transition-all shadow-lg shadow-teal-500/20';
-  startBtn.textContent = selectedMode === 'daily' && dailyDone ? 'Play Daily Again' : 'Start Game';
+  function refreshStartButtonLabel() {
+    startBtn.textContent = selectedMode === 'daily' && dailyDone ? 'Play Daily Again' : 'Start Game';
+  }
+  refreshStartButtonLabel();
   startBtn.addEventListener('click', () => {
     const cats = selectedMode === 'classic' ? [...selectedCategories] : [];
-    startGame(selectedMode, cats);
+    const adrs = selectedMode === 'adr' ? [...selectedAdrSources] : [];
+    if (selectedMode === 'adr' && adrs.length === 0) {
+      alert('Select at least one ADR for ADR Focus mode.');
+      return;
+    }
+    startGame(selectedMode, cats, adrs);
   });
   app.appendChild(startBtn);
 
@@ -161,10 +235,19 @@ function showStartScreen() {
   app.appendChild(footer);
 }
 
-function startGame(mode, categories) {
-  createGame(app, { mode, categories }, (gameState, newAchievements, continueCallback) => {
+function startGame(mode, categories, adrSources = []) {
+  createGame(app, { mode, categories, adrSources }, (gameState, newAchievements, continueCallback) => {
     showResultsScreen(gameState, newAchievements, continueCallback);
   });
+}
+
+function formatAdrLabel(source) {
+  const slug = source.replace(/\/+$/, '').split('/').pop() || source;
+  const title = slug
+    .replace(/^\d{8}-/, '')
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return title.length > 44 ? `${title.slice(0, 41)}...` : title;
 }
 
 function showResultsScreen(gameState, newAchievements, continueCallback) {
